@@ -18,18 +18,36 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+  text-align: center;
 }
 
-.levelBtn {
-  width: 300px;
+#introText {
+  max-width: 600px;
+  margin: 20px 0 30px 0;
+  line-height: 1.6;
+  color: #b0b9c6;
+  font-size: 16px;
+}
+
+.menuBtn {
+  width: 250px;
   padding: 14px;
-  margin: 10px;
+  margin: 8px;
   font-size: 16px;
   cursor: pointer;
   background: #1c2430;
   border: 1px solid #2c3544;
   color: white;
   border-radius: 10px;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.menuBtn:hover {
+  background: #252d3a;
+  border-color: #3a4554;
 }
 
 #game {
@@ -38,20 +56,42 @@ body {
   flex-direction: column;
 }
 
+/* Split layout: Situation text left, Image right */
 #scene {
   flex: 1;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   background: radial-gradient(circle at center, #1a2230, #0b0f14);
   position: relative;
+  padding: 40px;
+  gap: 40px;
+  box-sizing: border-box;
+}
+
+#situationContainer {
+  flex: 1;
+  max-width: 60%;
+}
+
+#situationText {
+  font-size: 18px;
+  line-height: 1.6;
+  color: #e2e8f0;
+}
+
+#imageContainer {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #portrait {
   width: 280px;
   height: 280px;
   border-radius: 20px;
-  border: 2px solid #333;
+  border: 2px solid #2c3544;
   object-fit: cover;
   background: #111;
 }
@@ -62,44 +102,48 @@ body {
   left: 16px;
   opacity: 0.6;
   font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 #dialogue {
   background: rgba(10,14,20,0.95);
   border-top: 2px solid #2a2f3a;
-  padding: 16px;
+  padding: 20px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  max-height: 300px;
-  overflow-y: auto;
+  max-height: 320px;
 }
 
 #prompt {
-  font-size: 18px;
+  font-size: 20px;
   margin-bottom: 16px;
-  color: #d7e2ff;
+  color: #ffdd67; /* Stands out as character speech */
+  font-style: italic;
   flex-shrink: 0;
-  min-height: 50px;
 }
 
 #choices {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   overflow-y: auto;
 }
 
 .choiceBtn {
   width: 100%;
-  padding: 10px;
+  padding: 12px 16px;
   background: #1c2430;
   border: 1px solid #2c3544;
   color: white;
   cursor: pointer;
   text-align: left;
   border-radius: 8px;
+  font-size: 15px;
+  line-height: 1.4;
   flex-shrink: 0;
+  transition: background 0.2s;
 }
 
 .choiceBtn:hover {
@@ -111,22 +155,32 @@ body {
   display: none;
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.85);
+  background: rgba(11, 15, 20, 0.95);
   align-items: center;
   justify-content: center;
   flex-direction: column;
   text-align: center;
-  padding: 20px;
+  padding: 40px;
+  z-box-sizing: border-box;
+}
+
+#scoreBox {
+  max-width: 600px;
+  margin-bottom: 24px;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 .endBtn {
-  margin-top: 10px;
-  padding: 10px 14px;
+  margin: 6px;
+  width: 200px;
+  padding: 12px;
   background: #1c2430;
   border: 1px solid #2c3544;
   color: white;
   cursor: pointer;
   border-radius: 8px;
+  font-weight: bold;
 }
 
 .endBtn:hover {
@@ -138,22 +192,31 @@ body {
 
 <div id="home">
   <h1>Conversation Quality VN</h1>
-  <button class="levelBtn" onclick="start(0)">Level 1: Alien Visitor</button>
-  <button class="levelBtn" onclick="start(1)">Level 2: Time Traveler</button>
-  <button class="levelBtn" onclick="start(2)">Level 3: Cooking Judge</button>
+  <div id="introText">
+    <p>Pick a scenario below to test your communication skills.</p>
+    <p>At each round, pick the response that feels most like something a real, thoughtful person would say — engaging, grounded, and natural.</p>
+    <p><strong>Avoid safe/flat text, and watch out for empty, generic 'AI slop' answers!</strong></p>
+  </div>
+  <button class="menuBtn" onclick="startGame()">Start</button>
+  <button class="menuBtn" onclick="replayGame()">Replay</button>
 </div>
 
 <div id="game">
   <div id="scene">
     <div id="title"></div>
-    <img id="portrait" />
+    
+    <div id="situationContainer">
+      <div id="situationText"></div>
+    </div>
+    <div id="imageContainer">
+      <img id="portrait" alt="Character Portrait" />
+    </div>
 
     <div id="end">
-      <h2>Level Complete</h2>
+      <h2 id="endHeading">Scenario Complete</h2>
       <div id="scoreBox"></div>
       <button class="endBtn" id="nextBtn" onclick="next()">Continue</button>
-      <button class="endBtn" onclick="retryLevel()">Retry Level</button>
-      <button class="endBtn" onclick="home()">Home</button>
+      <button class="endBtn" onclick="home()">Home Menu</button>
     </div>
   </div>
 
@@ -166,21 +229,27 @@ body {
 <script>
 const levels = [
 {
-name:"Alien Visitor",
+name:"The Alien Disguise",
 nodes:[
-{prompt:"So where are you visiting from? You have a bit of an accent I can't place.",img:"images/alien_1.png",
+{
+situation: "You've just landed on Earth, disguised as a human, sitting down for coffee with a curious local named Maya who's noticed something's off about you.",
+prompt:"Maya: 'So… where are you visiting from? You have a bit of an accent I can't place.'",img:"images/alien_1.png",
 choices:[
 {t:"I'm from a small town, not far from here. People say I have an accent but I don't really notice it",s:5},
 {t:"That's such a great question! I'd love to share more about where I'm from.",s:0},
 {t:"Honestly? Further than you'd guess. I've been trying to get the hang of saying 'th' sounds - my mouth wants to do something else entirely",s:10}
 ]},
-{prompt:"Okay, mystery person. What's the weirdest thing about Earth so far?",img:"images/alien_2.png",
+{
+situation: "Maya leans in, her eyes lighting up with genuine curiosity. Your vulnerability caught her attention.",
+prompt:"Maya: 'Okay, mystery person. What's the weirdest thing about Earth so far?'",img:"images/alien_2.png",
 choices:[
 {t:"There are honestly so many fascinating things about Earth.",s:0},
 {t:"Honestly, the fact that you have a holiday specifically for being scared.",s:10},
 {t:"Probably the food. There's just so much variety.",s:5}
 ]},
-{prompt:"Be honest - are you even from this planet?",img:"images/alien_3.png",
+{
+situation: "Maya looks at you intently, half-joking but entirely intrigued.",
+prompt:"Maya: 'Be honest — are you even from this planet?'",img:"images/alien_3.png",
 choices:[
 {t:"That's such an interesting question to ask! While I can't speak to where everyone is from, I think what matters most is the connections we make, don't you think?",s:0},
 {t:"Define 'this planet.' Okay, fine, I'll let you keep wondering. But for the record, your coffee is genuinely one of the best things about Earth so far.",s:10},
@@ -188,21 +257,27 @@ choices:[
 ]}
 ]},
 {
-name:"Time Traveler",
+name:"The Time Traveler",
 nodes:[
-{prompt:"Nice jacket. Never seen a cut like that before. Where'd you get it?",img:"images/time_1.png",
+{
+situation: "You've just stepped out of a time machine into 1925 New Orleans. Dressed in modern clothes, you sit down at a diner counter. A friendly local named Otis strikes up a conversation.",
+prompt:"Otis: 'Nice jacket — never seen a cut like that before. Where'd you get it?'",img:"images/time_1.png",
 choices:[
 {t:"Thank you so much for noticing! I really appreciate compliments like that — it means a lot to me!",s:0},
 {t:"Oh, just a store back home. I don't remember which one.",s:5},
 {t:"Honestly, it was a gift. I didn't pick it out myself. I'm starting to think I should've dressed a little less loud, though, judging by the look you just gave me.",s:10}
 ]},
-{prompt:"You've got a funny way of talking too. You're not one of those folks from out west, are you?",img:"images/time_2.png",
+{
+situation: "Otis lets out a hearty laugh, slapping the counter. Your self-awareness wins him over completely.",
+prompt:"Otis: 'Haha! Well, it's loud alright, but you carry it fine. You're not one of those folks from out west, are you?'",img:"images/time_2.png",
 choices:[
 {t:"That's a really interesting observation! Everyone has their own unique way of speaking, and I think that's something to be celebrated!",s:0},
 {t:"Something like that — let's just say I've traveled more than most.",s:10},
 {t:"No, I'm not from out west. I just talk like this normally.",s:5}
 ]},
-{prompt:"Say, you ever hear what's gonna happen with all this prohibition business? Feels like it could go on forever.",img:"images/time_3.png",
+{
+situation: "You've kept him intrigued by playing the mysterious, well-traveled stranger. Otis leans in closer, dropping his voice to a whisper.",
+prompt:"Otis: 'Say, since you've been around... you ever hear what's gonna happen with all this prohibition business? Feels like it could go on forever, and a man just wants to know where to buy a decent drink.'",img:"images/time_3.png",
 choices:[
 {t:"That's such a thought-provoking question! While I can't predict the future, I think it's important to consider all perspectives on big societal issues like this one.",s:0},
 {t:"I don't really know much about politics, so I couldn't say.",s:5},
@@ -210,21 +285,27 @@ choices:[
 ]}
 ]},
 {
-name:"Cooking Judge",
+name:"The Cooking Show Judge",
 nodes:[
-{prompt:"What do you think of my 'no pasta' penne pasta?",img:"images/chef_1.png",
+{
+situation: "The bright studio lights shine down on you. A nervous young chef named Marcus stands across the station. He has just served you his dish—a 'deconstructed' lasagna—and is biting his lip, waiting for your reaction.",
+prompt:"Marcus: 'So… what do you think? Be honest.'",img:"images/chef_1.png",
 choices:[
 {t:"It's good. Nice job.",s:5},
 {t:"Wow, what an incredible dish! I can really tell you put so much heart and effort into this, and that's what cooking is all about! Every dish tells a story.",s:0},
 {t:"The flavors are there — the ricotta filling especially is really well-seasoned. But honestly, calling it 'no pasta' feels like it's working against you here; penne pasta's whole appeal is the pasta together with the beef, and I miss that.",s:10}
 ]},
-{prompt:"If you could change one thing, what would it be?",img:"images/chef_2.png",
+{
+situation: "Marcus nods rapidly, taking a mental note. Your specific critique hurts a little, but he respects your palate instantly. The show director signals through your earpiece that this is great television.",
+prompt:"Marcus: 'I get that. I wanted to try something modern, but maybe I lost the soul of the dish. If you could change just one thing about it right now, what would it be?'",img:"images/chef_2.png",
 choices:[
 {t:"That's a great question! I think every dish has room to grow, and the most important thing is that you keep experimenting and believing in yourself!",s:0},
 {t:"I'd cut the basil oil drizzle — on its own it's great, but it's fighting with the tomato sauce for attention. Pick one star and let it shine.",s:10},
 {t:"Maybe tweak the seasoning.",s:5}
 ]},
-{prompt:"Last question - does it feel like this dish could win the competition?",img:"images/chef_3.png",
+{
+situation: "You've given Marcus tangible, professional feedback. He leans against his station, looking at you with intense focus as the cameras zoom in on both of your faces.",
+prompt:"Marcus: 'Last question, chef — does this feel like a dish that could win the whole competition?'",img:"images/chef_3.png",
 choices:[
 {t:"Maybe. Hard to say.",s:5},
 {t:"I truly believe every contestant can win. And your passion really shines through in this dish! Keep believing in yourself!",s:0},
@@ -233,82 +314,101 @@ choices:[
 ]}
 ];
 
-let level=0,node=0,score=0;
+let level = 0, node = 0, cumulativeScore = 0, currentLevelScore = 0;
 
-function start(i){
- level=i; node=0; score=0;
- document.getElementById("end").style.display="none";
- document.getElementById("home").style.display="none";
- document.getElementById("game").style.display="flex";
- render();
+function startGame() {
+  level = 0; 
+  node = 0; 
+  cumulativeScore = 0; 
+  currentLevelScore = 0;
+  document.getElementById("end").style.display = "none";
+  document.getElementById("home").style.display = "none";
+  document.getElementById("game").style.display = "flex";
+  render();
 }
 
-function home(){
- document.getElementById("end").style.display="none";
- level=0; node=0; score=0;
- document.getElementById("home").style.display="flex";
- document.getElementById("game").style.display="none";
+function replayGame() {
+  startGame();
 }
 
-function retryLevel(){
- document.getElementById("end").style.display="none";
- node=0; score=0;
- render();
+function home() {
+  document.getElementById("end").style.display = "none";
+  level = 0; node = 0; cumulativeScore = 0; currentLevelScore = 0;
+  document.getElementById("home").style.display = "flex";
+  document.getElementById("game").style.display = "none";
 }
 
-function render(){
- const L=levels[level];
- const N=L.nodes[node];
+function render() {
+  const L = levels[level];
+  const N = L.nodes[node];
 
- document.getElementById("title").innerText=L.name;
- document.getElementById("portrait").src=N.img;
- document.getElementById("prompt").innerText=N.prompt;
+  document.getElementById("title").innerText = L.name;
+  document.getElementById("situationText").innerText = N.situation;
+  document.getElementById("portrait").src = N.img;
+  document.getElementById("prompt").innerText = N.prompt;
 
- const choices=document.getElementById("choices");
- choices.innerHTML="";
+  const choices = document.getElementById("choices");
+  choices.innerHTML = "";
 
- N.choices.forEach(c=>{
-   const b=document.createElement("button");
-   b.className="choiceBtn";
-   b.innerText=c.t;
-   b.onclick=()=>{
-      score+=c.s;
-      node++;
-      if(node>=L.nodes.length) end();
-      else render();
-   };
-   choices.appendChild(b);
- });
+  N.choices.forEach(c => {
+    const b = document.createElement("button");
+    b.className = "choiceBtn";
+    b.innerText = c.t;
+    b.onclick = () => {
+       currentLevelScore += c.s;
+       cumulativeScore += c.s;
+       node++;
+       if(node >= L.nodes.length) endLevel();
+       else render();
+    };
+    choices.appendChild(b);
+  });
 }
 
-function end(){
- document.getElementById("end").style.display="flex";
+function endLevel() {
+  document.getElementById("end").style.display = "flex";
+  const isFinalLevel = (level >= levels.length - 1);
+  
+  if (isFinalLevel) {
+    document.getElementById("endHeading").innerText = "Campaign Completed!";
+    
+    let performanceTitle = "";
+    let feedback = "";
 
- let titleText="";
- let feedback="";
+    if (cumulativeScore >= 75) {
+      performanceTitle = "Excellent Human Communication";
+      feedback = "You consistently picked responses that felt human: specific, opinionated, and grounded in reality without turning to lazy, safe filters.";
+    } else if (cumulativeScore >= 45) {
+      performanceTitle = "Mixed Grounding";
+      feedback = "Some of your responses were sharp, but you drifted back into safe corporate filters or flat pleasantries elsewhere. Push for more authenticity!";
+    } else {
+      performanceTitle = "Pure AI Slop";
+      feedback = "Your choices heavily leaned into empty platitudes, robotic enthusiasm, and passive hedging. Real humans don't talk like that!";
+    }
 
- if(score>=25){
-   titleText="Excellent";
-   feedback="You consistently picked responses that felt human: specific, opinionated, and grounded in the scenario's reality without overclaiming or making things up.";
- }else if(score>=15){
-   titleText="Mixed Bag";
-   feedback="Some picks were genuinely engaging, others played it too safe. Notice where you picked the middle-ground responses — what made them feel fine but forgettable?";
- }else{
-   titleText="Slop Alert";
-   feedback="Several picks leaned on generic enthusiasm or hedging instead of substance. These are the patterns to watch for when reviewing AI-generated conversations.";
- }
-
- document.getElementById("scoreBox").innerHTML =
-   "<strong>Score:</strong> "+score+"/30<br><br><strong>"+titleText+"</strong><br><br>"+feedback;
-
- document.getElementById("nextBtn").innerText =
-   level < levels.length-1 ? "Next Level" : "Finish";
+    document.getElementById("scoreBox").innerHTML = 
+      "<strong>Final Total Score:</strong> " + cumulativeScore + " / 90<br><br><strong>" + performanceTitle + "</strong><br><br>" + feedback;
+    
+    document.getElementById("nextBtn").innerText = "Finish";
+  } else {
+    document.getElementById("endHeading").innerText = "Scenario Complete";
+    document.getElementById("scoreBox").innerHTML = 
+      "You've completed <strong>" + levels[level].name + "</strong>.<br>Scenario Score: " + currentLevelScore + " / 30";
+    
+    document.getElementById("nextBtn").innerText = "Next Scenario";
+  }
 }
 
-function next(){
- document.getElementById("end").style.display="none";
- if(level < levels.length-1) start(level+1);
- else home();
+function next() {
+  document.getElementById("end").style.display = "none";
+  if (level < levels.length - 1) {
+    level++;
+    node = 0;
+    currentLevelScore = 0;
+    render();
+  } else {
+    home();
+  }
 }
 </script>
 </body>
