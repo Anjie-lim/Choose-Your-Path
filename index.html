@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Conversation Quality VN</title>
+
+<style>
+body {
+  margin: 0;
+  background: #0b0f14;
+  font-family: Arial, sans-serif;
+  color: white;
+}
+
+/* HOME */
+#home {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.levelBtn {
+  width: 300px;
+  padding: 14px;
+  margin: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  background: #1c2430;
+  border: 1px solid #2c3544;
+  color: white;
+  border-radius: 10px;
+}
+
+/* GAME */
+#game {
+  display: none;
+  height: 100vh;
+  flex-direction: column;
+}
+
+#scene {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, #1a2230, #0b0f14);
+  position: relative;
+}
+
+#portrait {
+  width: 280px;
+  height: 280px;
+  border-radius: 20px;
+  border: 2px solid #333;
+  object-fit: cover;
+  background: #111;
+}
+
+#title {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  opacity: 0.6;
+  font-size: 13px;
+}
+
+#dialogue {
+  height: 260px;
+  background: rgba(10,14,20,0.95);
+  border-top: 2px solid #2a2f3a;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+#prompt {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #d7e2ff;
+}
+
+#text {
+  min-height: 60px;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.choiceBtn {
+  width: 100%;
+  margin: 6px 0;
+  padding: 10px;
+  background: #1c2430;
+  border: 1px solid #2c3544;
+  color: white;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 8px;
+}
+
+/* END */
+#end {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.endBtn {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: #1c2430;
+  border: 1px solid #2c3544;
+  color: white;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HOME -->
+<div id="home">
+  <h1>Conversation Quality VN</h1>
+
+  <button class="levelBtn" onclick="start(0)">Level 1: Alien Visitor</button>
+  <button class="levelBtn" onclick="start(1)">Level 2: Time Traveler</button>
+  <button class="levelBtn" onclick="start(2)">Level 3: Cooking Judge</button>
+</div>
+
+<!-- GAME -->
+<div id="game">
+
+  <div id="scene">
+    <div id="title"></div>
+    <img id="portrait" />
+
+    <div id="end">
+      <h2>Level Complete</h2>
+      <div id="scoreBox"></div>
+      <button class="endBtn" id="nextBtn" onclick="next()">Continue</button>
+      <button class="endBtn" onclick="home()">Home</button>
+    </div>
+  </div>
+
+  <div id="dialogue">
+    <div id="prompt"></div>
+    <div id="text"></div>
+    <div id="choices"></div>
+  </div>
+
+</div>
+
+<script>
+
+/* ---------------- LEVELS ---------------- */
+
+const levels = [
+  {
+    name: "Alien Visitor",
+    nodes: [
+      {
+        prompt: "Where are you from?",
+        img: "images/alien_1.png",
+        choices: [
+          {t:"Farther than you'd guess", s:10},
+          {t:"Small town nearby", s:5},
+          {t:"Great question!", s:0}
+        ]
+      },
+      {
+        prompt: "What’s weird here?",
+        img: "images/alien_2.png",
+        choices: [
+          {t:"You celebrate fear annually", s:10},
+          {t:"Food variety is wild", s:5},
+          {t:"Everything is amazing", s:0}
+        ]
+      },
+      {
+        prompt: "Are you from Earth?",
+        img: "images/alien_3.png",
+        choices: [
+          {t:"Define Earth", s:10},
+          {t:"Yes", s:5},
+          {t:"What matters is connection", s:0}
+        ]
+      }
+    ]
+  },
+
+  {
+    name: "Time Traveler",
+    nodes: [
+      {
+        prompt: "Nice jacket",
+        img: "images/time_1.png",
+        choices: [
+          {t:"It was a gift", s:10},
+          {t:"Store back home", s:5},
+          {t:"Thanks!", s:0}
+        ]
+      },
+      {
+        prompt: "Funny way of speaking",
+        img: "images/time_2.png",
+        choices: [
+          {t:"I've traveled more than most", s:10},
+          {t:"Just how I talk", s:5},
+          {t:"Everyone is unique", s:0}
+        ]
+      },
+      {
+        prompt: "Prohibition?",
+        img: "images/time_3.png",
+        choices: [
+          {t:"Won’t last long", s:10},
+          {t:"Not sure", s:5},
+          {t:"Many perspectives", s:0}
+        ]
+      }
+    ]
+  },
+
+  {
+    name: "Cooking Judge",
+    nodes: [
+      {
+        prompt: "Thoughts?",
+        img: "images/chef_1.png",
+        choices: [
+          {t:"Good flavors, weak structure", s:10},
+          {t:"It’s good", s:5},
+          {t:"Amazing effort", s:0}
+        ]
+      },
+      {
+        prompt: "What change?",
+        img: "images/chef_2.png",
+        choices: [
+          {t:"Remove basil oil clash", s:10},
+          {t:"Minor tweak", s:5},
+          {t:"It’s perfect", s:0}
+        ]
+      },
+      {
+        prompt: "Could it win?",
+        img: "images/chef_3.png",
+        choices: [
+          {t:"Not yet, but close", s:10},
+          {t:"Maybe", s:5},
+          {t:"Everyone wins", s:0}
+        ]
+      }
+    ]
+  }
+];
+
+/* ---------------- STATE ---------------- */
+
+let level = 0;
+let node = 0;
+let score = 0;
+
+/* ---------------- NAV ---------------- */
+
+function start(i){
+  level = i;
+  node = 0;
+  score = 0;
+
+  document.getElementById("home").style.display = "none";
+  document.getElementById("game").style.display = "flex";
+
+  render();
+}
+
+function home(){
+  document.getElementById("home").style.display = "flex";
+  document.getElementById("game").style.display = "none";
+}
+
+/* ---------------- RENDER ---------------- */
+
+function render(){
+  const L = levels[level];
+  const N = L.nodes[node];
+
+  document.getElementById("title").innerText = L.name;
+
+  document.getElementById("portrait").src = N.img;
+
+  document.getElementById("prompt").innerText = N.prompt;
+  document.getElementById("choices").innerHTML = "";
+
+  N.choices.forEach(c => {
+    const b = document.createElement("button");
+    b.className = "choiceBtn";
+    b.innerText = c.t;
+
+    b.onclick = () => {
+      score += c.s;
+      node++;
+
+      if(node >= L.nodes.length){
+        end();
+      } else {
+        render();
+      }
+    };
+
+    document.getElementById("choices").appendChild(b);
+  });
+}
+
+/* ---------------- END ---------------- */
+
+function end(){
+  document.getElementById("end").style.display = "flex";
+
+  let msg =
+    score >= 85 ? "Excellent" :
+    score >= 60 ? "Mixed" :
+    "Slop-prone";
+
+  document.getElementById("scoreBox").innerText =
+    `Score: ${score} — ${msg}`;
+
+  document.getElementById("nextBtn").innerText =
+    level < levels.length - 1 ? "Next Level" : "Finish";
+}
+
+/* ---------------- NEXT ---------------- */
+
+function next(){
+  document.getElementById("end").style.display = "none";
+
+  if(level < levels.length - 1){
+    start(level + 1);
+  } else {
+    home();
+  }
+}
+
+</script>
+
+</body>
+</html>
