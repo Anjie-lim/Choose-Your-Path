@@ -12,7 +12,6 @@ body {
   color: white;
 }
 
-/* HOME */
 #home {
   height: 100vh;
   display: flex;
@@ -33,7 +32,6 @@ body {
   border-radius: 10px;
 }
 
-/* GAME */
 #game {
   display: none;
   height: 100vh;
@@ -80,12 +78,6 @@ body {
   color: #d7e2ff;
 }
 
-#text {
-  min-height: 60px;
-  margin-bottom: 10px;
-  font-size: 16px;
-}
-
 .choiceBtn {
   width: 100%;
   margin: 6px 0;
@@ -98,7 +90,6 @@ body {
   border-radius: 8px;
 }
 
-/* END */
 #end {
   display: none;
   position: absolute;
@@ -107,6 +98,8 @@ body {
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  text-align: center;
+  padding: 20px;
 }
 
 .endBtn {
@@ -119,21 +112,16 @@ body {
 }
 </style>
 </head>
-
 <body>
 
-<!-- HOME -->
 <div id="home">
   <h1>Conversation Quality VN</h1>
-
   <button class="levelBtn" onclick="start(0)">Level 1: Alien Visitor</button>
   <button class="levelBtn" onclick="start(1)">Level 2: Time Traveler</button>
   <button class="levelBtn" onclick="start(2)">Level 3: Cooking Judge</button>
 </div>
 
-<!-- GAME -->
 <div id="game">
-
   <div id="scene">
     <div id="title"></div>
     <img id="portrait" />
@@ -142,210 +130,164 @@ body {
       <h2>Level Complete</h2>
       <div id="scoreBox"></div>
       <button class="endBtn" id="nextBtn" onclick="next()">Continue</button>
+      <button class="endBtn" onclick="retryLevel()">Retry Level</button>
       <button class="endBtn" onclick="home()">Home</button>
     </div>
   </div>
 
   <div id="dialogue">
     <div id="prompt"></div>
-    <div id="text"></div>
     <div id="choices"></div>
   </div>
-
 </div>
 
 <script>
-
-/* ---------------- LEVELS ---------------- */
-
 const levels = [
-  {
-    name: "Alien Visitor",
-    nodes: [
-      {
-        prompt: "so where are you visiting from? You have a bit of an accent I can't place.",
-        img: "images/alien_1.png",
-        choices: [
-          {t:"Honesstly? Further than you'd guess. I've been trying to get the hang of saying 'th' sounds - my mouth wants to do something else entirely", s:10},
-          {t:"I'm from a small town, not far from here. People say I have an accent but i don't really notice it", s:5},
-          {t:"That's such a great question! I'd love to shar emore about where I'm from - it's a really fascinating palce with rich culture and history that I think you'd find interesting", s:0}
-        ]
-      },
-      {
-        prompt: "Okay, mystery person. What’s the weirdest thing about Earth so far?",
-        img: "images/alien_2.png",
-        choices: [
-          {t:"Honestly, the fact that you have a holiday specifically for being scared - and you do it on purpose, every year. Where I come form that would just be... a Tuesday", s:10},
-          {t:"Probably the food. there's just so much variety, it's a lot to take in", s:5},
-          {t:"Wow, that's a great question! There are honestly so many fascinating and unique things about Earth - the culture, the people, the food, the nature - it's all just so amazing", s:0}
-        ]
-      },
-      {
-        prompt: "Be honest - are you even from this planet?",
-        img: "images/alien_3.png",
-        choices: [
-          {t:"Define 'this planet.' Okay, fine, I'll let you keep wondering. But for the reconrd, your coffee is genuienly one of the best things about Earth so far", s:10},
-          {t:"Haha, no, I'm from Earth, just a different part. Why do you ask", s:5},
-          {t:"That's such an interesting question to ask!While I can't speak for everyone, I thnk what matters most is the connections we make, don't you think", s:0}
-        ]
-      }
-    ]
-  },
-
-  {
-    name: "Time Traveler",
-    nodes: [
-      {
-        prompt: "Nice jacket. Never seen a cut like that before. Where'd you get it?",
-        img: "images/time_1.png",
-        choices: [
-          {t:"Honesty, it was a gift. I didn't pick it out myself. I'm starting to think I should've dressed a little less..loud, though, judging by your look", s:10},
-          {t:"Oh, just a store back home. I don't remember which one", s:5},
-          {t:"Thank you so much for noticing! I really appreciate compliments like that. It means a lot to me", s:0}
-        ]
-      },
-      {
-        prompt: "You've got a funny way of talking too. You're not one of those folks from out west, are you?",
-        img: "images/time_2.png",
-        choices: [
-          {t:"Somethng like that. Let's just say I've traveled more than most", s:10},
-          {t:"No, I'm not from out west. Just how I talk", s:5},
-          {t:"That's a really interesting observationI Everyone has a  unique way of speaking, and that's something to be celebrated", s:0}
-        ]
-      },
-      {
-        prompt: "Say, you ever hear what's gonna happen with all this prohibition business? Feels like it could go on forever",
-        img: "images/time_3.png",
-        choices: [
-          {t:"My money's on it not lasting as long as people think. Probably gone within the decase. Mark my words", s:10},
-          {t:"I don't really know much about politics, so I couldn't say", s:5},
-          {t:"that's such a thought-provoking question! While I cant predict the future, I think its important to consider all perspectives", s:0}
-        ]
-      }
-    ]
-  },
-
-  {
-    name: "Cooking Judge",
-    nodes: [
-      {
-        prompt: "So... what do you think of my deconstructured lasagna? Be honest.",
-        img: "images/chef_1.png",
-        choices: [
-          {t:"The flavors are there. The ricotta filling especially is really well-seasoned. But honestly, calling it 'deconstructed' feels like it's working agains you here; lasagna's appeal is the layers melting together", s:10},
-          {t:"It’s good. I like it. Nice job", s:5},
-          {t:"Wow, what an incredible dish! I can really tell you put so much heart and effort into this. And that's what's cooking is alll about. Every dish tells a story", s:0}
-        ]
-      },
-      {
-        prompt: "If you could change one thing about it, what would it be?",
-        img: "images/chef_2.png",
-        choices: [
-          {t:"I'd cut the basil oil drizzle. On its won it's great, but it's fighting with the tomato sauce for attention. Pick one star and let it shine", s:10},
-          {t:"Maybe just tweak the seasoning a little more", s:5},
-          {t:"That's a great question. I think every dish has a room to grow, and the most important thing is that you keep experimenting and believing in yourself", s:0}
-        ]
-      },
-      {
-        prompt: "Last question. Does it feel like aa dish that could win the whole competition?",
-        img: "images/chef_3.png",
-        choices: [
-          {t:"To be honest, not in this form. It needs that one fix we talked about. But the bones of it, the seasoning and pasta are competition-level. Fix the compositoin and you've got it", s:10},
-          {t:"Maybe. It's hard to say with these things", s:5},
-          {t:"I truly believe every contestant here has what it takes to win, and your passion really shines through in this dish! Keep believing in your self", s:0}
-        ]
-      }
-    ]
-  }
+{
+name:"Alien Visitor",
+nodes:[
+{prompt:"so where are you visiting from? You have a bit of an accent I can't place.",img:"images/alien_1.png",
+choices:[
+{t:"Honestly? Further than you'd guess. I've been trying to get the hang of saying 'th' sounds - my mouth wants to do something else entirely",s:10},
+{t:"I'm from a small town, not far from here. People say I have an accent but I don't really notice it",s:5},
+{t:"That's such a great question! I'd love to share more about where I'm from.",s:0}
+]},
+{prompt:"Okay, mystery person. What’s the weirdest thing about Earth so far?",img:"images/alien_2.png",
+choices:[
+{t:"Honestly, the fact that you have a holiday specifically for being scared.",s:10},
+{t:"Probably the food. There's just so much variety.",s:5},
+{t:"There are honestly so many fascinating things about Earth.",s:0}
+]},
+{prompt:"Be honest - are you even from this planet?",img:"images/alien_3.png",
+choices:[
+{t:"Define 'this planet.' Okay, fine, I'll let you keep wondering.",s:10},
+{t:"Haha, no, I'm from Earth.",s:5},
+{t:"That's such an interesting question to ask!",s:0}
+]}
+]},
+{
+name:"Time Traveler",
+nodes:[
+{prompt:"Nice jacket. Never seen a cut like that before. Where'd you get it?",img:"images/time_1.png",
+choices:[
+{t:"Honestly, it was a gift. I'm starting to think I should've dressed less loudly.",s:10},
+{t:"Just a store back home.",s:5},
+{t:"Thank you so much for noticing!",s:0}
+]},
+{prompt:"You've got a funny way of talking too.",img:"images/time_2.png",
+choices:[
+{t:"Let's just say I've traveled more than most.",s:10},
+{t:"Just how I talk.",s:5},
+{t:"Everyone has a unique way of speaking.",s:0}
+]},
+{prompt:"You ever hear what's gonna happen with prohibition?",img:"images/time_3.png",
+choices:[
+{t:"My money's on it not lasting as long as people think.",s:10},
+{t:"I couldn't say.",s:5},
+{t:"It's important to consider all perspectives.",s:0}
+]}
+]},
+{
+name:"Cooking Judge",
+nodes:[
+{prompt:"What do you think of my deconstructed lasagna?",img:"images/chef_1.png",
+choices:[
+{t:"The flavors are there, but deconstructing it hurts what makes lasagna work.",s:10},
+{t:"It's good. Nice job.",s:5},
+{t:"Every dish tells a story.",s:0}
+]},
+{prompt:"If you could change one thing?",img:"images/chef_2.png",
+choices:[
+{t:"I'd cut the basil oil drizzle.",s:10},
+{t:"Maybe tweak the seasoning.",s:5},
+{t:"Keep experimenting and believing in yourself.",s:0}
+]},
+{prompt:"Could it win the competition?",img:"images/chef_3.png",
+choices:[
+{t:"Not in this form, but it's close.",s:10},
+{t:"Maybe. Hard to say.",s:5},
+{t:"I truly believe every contestant can win.",s:0}
+]}
+]}
 ];
 
-/* ---------------- STATE ---------------- */
-
-let level = 0;
-let node = 0;
-let score = 0;
-
-/* ---------------- NAV ---------------- */
+let level=0,node=0,score=0;
 
 function start(i){
-  level = i;
-  node = 0;
-  score = 0;
-
-  document.getElementById("home").style.display = "none";
-  document.getElementById("game").style.display = "flex";
-
-  render();
+ level=i; node=0; score=0;
+ document.getElementById("end").style.display="none";
+ document.getElementById("home").style.display="none";
+ document.getElementById("game").style.display="flex";
+ render();
 }
 
 function home(){
-  document.getElementById("home").style.display = "flex";
-  document.getElementById("game").style.display = "none";
+ document.getElementById("end").style.display="none";
+ level=0; node=0; score=0;
+ document.getElementById("home").style.display="flex";
+ document.getElementById("game").style.display="none";
 }
 
-/* ---------------- RENDER ---------------- */
+function retryLevel(){
+ document.getElementById("end").style.display="none";
+ node=0; score=0;
+ render();
+}
 
 function render(){
-  const L = levels[level];
-  const N = L.nodes[node];
+ const L=levels[level];
+ const N=L.nodes[node];
 
-  document.getElementById("title").innerText = L.name;
+ title.innerText=L.name;
+ portrait.src=N.img;
+ prompt.innerText=N.prompt;
 
-  document.getElementById("portrait").src = N.img;
+ const choices=document.getElementById("choices");
+ choices.innerHTML="";
 
-  document.getElementById("prompt").innerText = N.prompt;
-  document.getElementById("choices").innerHTML = "";
-
-  N.choices.forEach(c => {
-    const b = document.createElement("button");
-    b.className = "choiceBtn";
-    b.innerText = c.t;
-
-    b.onclick = () => {
-      score += c.s;
+ N.choices.forEach(c=>{
+   const b=document.createElement("button");
+   b.className="choiceBtn";
+   b.innerText=c.t;
+   b.onclick=()=>{
+      score+=c.s;
       node++;
-
-      if(node >= L.nodes.length){
-        end();
-      } else {
-        render();
-      }
-    };
-
-    document.getElementById("choices").appendChild(b);
-  });
+      if(node>=L.nodes.length) end();
+      else render();
+   };
+   choices.appendChild(b);
+ });
 }
-
-/* ---------------- END ---------------- */
 
 function end(){
-  document.getElementById("end").style.display = "flex";
+ document.getElementById("end").style.display="flex";
 
-  let msg =
-    score >= 85 ? "Excellent" :
-    score >= 60 ? "Mixed" :
-    "Slop-prone";
+ let titleText="";
+ let feedback="";
 
-  document.getElementById("scoreBox").innerText =
-    `Score: ${score} — ${msg}`;
+ if(score>=25){
+   titleText="Excellent";
+   feedback="You consistently picked responses that felt human: specific, opinionated, and grounded in the scenario’s reality without overclaiming or making things up.";
+ }else if(score>=15){
+   titleText="Mixed Bag";
+   feedback="Some picks were genuinely engaging, others played it too safe. Notice where you picked the middle-ground responses — what made them feel fine but forgettable?";
+ }else{
+   titleText="Slop Alert";
+   feedback="Several picks leaned on generic enthusiasm or hedging instead of substance. These are the patterns to watch for when reviewing AI-generated conversations.";
+ }
 
-  document.getElementById("nextBtn").innerText =
-    level < levels.length - 1 ? "Next Level" : "Finish";
+ document.getElementById("scoreBox").innerHTML =
+   "<strong>Score:</strong> "+score+"/30<br><br><strong>"+titleText+"</strong><br><br>"+feedback;
+
+ document.getElementById("nextBtn").innerText =
+   level < levels.length-1 ? "Next Level" : "Finish";
 }
-
-/* ---------------- NEXT ---------------- */
 
 function next(){
-  document.getElementById("end").style.display = "none";
-
-  if(level < levels.length - 1){
-    start(level + 1);
-  } else {
-    home();
-  }
+ document.getElementById("end").style.display="none";
+ if(level < levels.length-1) start(level+1);
+ else home();
 }
-
 </script>
-
 </body>
 </html>
